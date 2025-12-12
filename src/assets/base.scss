@@ -1,0 +1,232 @@
+/* color palette from <https://github.com/vuejs/theme> */
+/* :root {
+  --vt-c-white: #ffffff;
+  --vt-c-white-soft: #f8f8f8;
+  --vt-c-white-mute: #f2f2f2;
+
+  --vt-c-black: #181818;
+  --vt-c-black-soft: #222222;
+  --vt-c-black-mute: #282828;
+
+  --vt-c-indigo: #2c3e50;
+
+  --vt-c-divider-light-1: rgba(60, 60, 60, 0.29);
+  --vt-c-divider-light-2: rgba(60, 60, 60, 0.12);
+  --vt-c-divider-dark-1: rgba(84, 84, 84, 0.65);
+  --vt-c-divider-dark-2: rgba(84, 84, 84, 0.48);
+
+  --vt-c-text-light-1: var(--vt-c-indigo);
+  --vt-c-text-light-2: rgba(60, 60, 60, 0.66);
+  --vt-c-text-dark-1: var(--vt-c-white);
+  --vt-c-text-dark-2: rgba(235, 235, 235, 0.64);
+} */
+
+/* semantic color variables for this project */
+/* :root {
+  --color-background: var(--vt-c-white);
+  --color-background-soft: var(--vt-c-white-soft);
+  --color-background-mute: var(--vt-c-white-mute);
+
+  --color-border: var(--vt-c-divider-light-2);
+  --color-border-hover: var(--vt-c-divider-light-1);
+
+  --color-heading: var(--vt-c-text-light-1);
+  --color-text: var(--vt-c-text-light-1);
+
+  --section-gap: 160px;
+} */
+
+/* @media (prefers-color-scheme: dark) {
+  :root {
+    --color-background: var(--vt-c-black);
+    --color-background-soft: var(--vt-c-black-soft);
+    --color-background-mute: var(--vt-c-black-mute);
+
+    --color-border: var(--vt-c-divider-dark-2);
+    --color-border-hover: var(--vt-c-divider-dark-1);
+
+    --color-heading: var(--vt-c-text-dark-1);
+    --color-text: var(--vt-c-text-dark-2);
+  }
+} */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+}
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+}
+#app {
+  height: 100%;
+  width: 100%;
+}
+/* 基于现代标准的CSS重置 */
+:root {
+  box-sizing: border-box;
+  --el-color-primary: #1677ff; /* 修改主题色（会影响所有组件） */
+  --el-input-focus-border: var(--el-color-primary); /* 单独修改输入框聚焦边框色 */
+  --el-input-focus-border-color: var(--el-color-primary);
+  --el-border-color-light: #ebeef5;
+  --el-border-radius-base: 6px;
+  --el-text-color-primary: #606266;
+  --hc-primary: #1677ff;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit; /* 统一盒模型 */
+  margin: 0;
+  padding: 0;
+}
+
+/* 移除默认边距和列表样式 */
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+ul,
+ol,
+dl,
+figure,
+blockquote,
+fieldset,
+legend,
+pre {
+  margin: 0;
+  padding: 0;
+}
+
+/* 列表样式重置 */
+ul,
+ol {
+  list-style: none;
+}
+
+/* 表单元素重置 */
+button,
+input,
+select,
+textarea {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  font: inherit;
+  outline: none;
+}
+
+/* 媒体元素自适应 */
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+/* 表格重置 */
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+/* 可点击元素去除默认样式 */
+a,
+button {
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* 禁用文本选中（按需添加） */
+.no-select {
+  user-select: none;
+}
+
+.el-header {
+  min-width: 1024px;
+  height: fit-content !important;
+  padding: 0;
+}
+.el-aside {
+  z-index: 10;
+  padding: 0;
+  width: fit-content !important;
+  background-color: rgb(15, 20, 53);
+}
+.el-container {
+  z-index: 9;
+}
+.el-main {
+  padding: 16px 20px;
+  background-color: #f1f2f5;
+  min-height: 640px;
+  min-width: 1024px;
+}
+.el-input__wrapper .is-focus {
+  border-color: #1677ff !important;
+}
+.el-breadcrumb__item {
+  height: 20px;
+  display: flex;
+  align-items: center;
+}
+.el-breadcrumb__separator {
+  color: #909399;
+  font-weight: 400;
+  font-size: 18px;
+}
+.el-tabs__nav-wrap::after {
+  border-bottom: 1px solid #e4e7ed !important;
+  height: 1px !important;
+}
+.el-tag--info {
+  border: 1px solid #e9e9eb !important;
+  color: #606266 !important;
+  background: #f4f4f5 !important;
+}
+.drawer-container .el-drawer__header {
+  margin-bottom: 0 !important;
+}
+.drawer-container .el-drawer__title {
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 26px;
+  color: #303133;
+}
+
+.add-entity-dialog{
+  padding: 24px !important;
+  .form-label{
+    font-weight: 400 !important;
+  }
+}
+.add-entity-dialog .el-dialog__headerbtn{
+  top: 12px !important;
+  right: 8px !important;
+}
+.add-entity-dialog .el-dialog__header{
+  padding-bottom: 24px !important;
+}
+.add-entity-dialog .el-dialog__title{
+  color: #303133 !important;
+  font-weight: 500 !important;
+}
+.add-entity-dialog .el-dialog__footer{
+  padding-top: 0 !important;
+}
