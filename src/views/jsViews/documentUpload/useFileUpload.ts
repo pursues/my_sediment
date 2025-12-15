@@ -2,9 +2,13 @@ import { ref, type Ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import type { UploadFile, DocumentItem } from '@/types/document'
 import { uploadDocument } from '@/api'
+import { useUploadStore } from '@/store/uploadData'
 
 // 允许上传的文件类型
 export const allowedExtensions = ['doc', 'docx', 'pdf', 'ppt', 'pptx', 'xls', 'xlsx']
+
+//存在 store 中的 文件夹 Id，目的是为了在上传中区分存储文件
+const kbId = ref('kbId')
 
 // 定义回调函数接口
 interface FileUploadCallbacks {
@@ -37,6 +41,8 @@ export const createFileHash = () => {
 
 export default function useFileUpload(callbacks: FileUploadCallbacks) {
 
+  const uploadStore = useUploadStore()
+
   const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}')
 
   // 上传相关
@@ -62,7 +68,7 @@ export default function useFileUpload(callbacks: FileUploadCallbacks) {
       status: 'waiting' as const,
       createdAt: getCurrentTime(),
       id: createFileHash(),
-      creator: userInfo.userName || '',// 当前登录人，****************联调之后，需要传入当前登录人**************//
+      creator: userInfo.userName || '眸子的色彩',// 当前登录人，****************联调之后，需要传入当前登录人**************//
       uploadController: new AbortController()
     }))
     return uploadFiles
@@ -121,6 +127,11 @@ export default function useFileUpload(callbacks: FileUploadCallbacks) {
   
   // 处理上传队列
   const processQueue = async () => {
+    // 获取 store 中已存在的文件
+    const existingStoreFiles = uploadStore.getFilesByKbId(kbId.value) || []
+
+    const newStoreItems: DocumentItem[] = []
+
     // 如果上传队列中的文件数量小于最大并发上传数，则继续上传
     while (activeUploads.value.size < MAX_CONCURRENT_UPLOADS && uploadQueue.value.length > 0) {
       // 拿到上传队列中的第一个文件，并从上传队列中移除此文件
@@ -132,6 +143,34 @@ export default function useFileUpload(callbacks: FileUploadCallbacks) {
       task.status = 'uploading'
       // 传回上级，更新表格数据
       callbacks.updateItemById(task.id, {status:'uploading'})
+
+
+      //找到当前文件夹
+      const existingFile = existingStoreFiles.find(f => f.id === task.id)
+      if (existingFile) {
+          // 如果文件已存在，更新状态为上传中
+          uploadStore.updateFile(kbId.value, task.id, { status: 'uploading' })
+            // 确保 file 对象存在, 理论上 retry 时 task.file 应该是有值的
+      } else {
+            // 如果是新文件，准备添加到 store
+          newStoreItems.push({
+              id: task.id,
+              name: task.name,
+              size: task.size,
+              status: task.status,
+              createdAt: task.createdAt,
+              type: task.type,
+              creator: task.creator,
+              // @ts-ignore 将 file 对象存入 store (Runtime only)，用于重试
+              file: task.file 
+          } as DocumentItem)
+      }
+      // 批量添加新文件到 store
+      if (newStoreItems.length > 0) {
+          uploadStore.addFiles(kbId.value, newStoreItems)
+      }
+
+
 
       // 每个任务独立处理，完成后自动触发后续任务
       handleUpload(task).finally(() => {
@@ -161,6 +200,8 @@ export default function useFileUpload(callbacks: FileUploadCallbacks) {
       //修改状态
       const newStatus = data.status  //? 'parsing' : 'failed';
       callbacks.updateItemById(task.id, {status:newStatus});
+      // 更新 store 中的状态
+      uploadStore.updateFile(kbId.value, task.id, { status: newStatus })
 
       // 成功的话，将初始前端设置的文件id改为上传成功后正式的文件ID
       if(data.id){
@@ -168,6 +209,8 @@ export default function useFileUpload(callbacks: FileUploadCallbacks) {
         activeUploads.value.delete(task.id)
         // 传回上级，更新表格数据
         callbacks.updateItemById(task.id, { id: data.id });
+        // 更新 store 中的 id 
+        uploadStore.updateFile(kbId.value, task.id, { id: data.id })
       }else {
         // 如果上传失败，则提示失败原因
         ElMessage.error(message)
@@ -176,6 +219,8 @@ export default function useFileUpload(callbacks: FileUploadCallbacks) {
       // ElMessage.error('上传接口未联调')
       // 将状态改为上传失败
       callbacks.updateItemById(task.id, {status:'failed'})
+      // 更新 store 中的状态
+      uploadStore.updateFile(kbId.value, task.id, { status: 'failed' })
     }
   }
 
@@ -207,6 +252,8 @@ export default function useFileUpload(callbacks: FileUploadCallbacks) {
     }
     // 取消之后还需要将文件从表格数据中移除
     callbacks.removeItemFromTable(fileItem.id)
+    // 从 store 中移除文件
+    uploadStore.removeFiles(kbId.value, [fileItem.id])
   }
   // 重新上传文档,说明是当前区间内的上传，所以用UploadFile类型
   const handleRetry = (fileItem: UploadFile) => {

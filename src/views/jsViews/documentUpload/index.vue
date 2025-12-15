@@ -44,10 +44,10 @@
         <el-table-column prop="fileName" label="文件名称" min-width="200">
           <template #default="scope">
             <div class="file-info">
-              <img :src="getFileIcon(scope.row.fileName)" alt="word" class="file-icon" />
+              <img :src="getFileIcon(scope.row.fileName || scope.row.name)" alt="word" class="file-icon" />
               <div class="file-details">
-                <div class="file-name">{{ scope.row.fileName }}</div>
-                <div class="file-size">{{ scope.row.fileSize }}</div>
+                <div class="file-name">{{ scope.row.fileName || scope.row.name }}</div>
+                <div class="file-size">{{ scope.row.fileSize || scope.row.size }}</div>
               </div>
             </div>
           </template>
@@ -66,7 +66,7 @@
 
         <el-table-column prop="creator" label="上传者" width="150" />
         
-        <el-table-column prop="uploadTime" label="上传时间" width="200" />
+        <el-table-column prop="createdAt" label="上传时间" width="200" />
 
         <el-table-column label="操作" width="180" fixed="right">
           <template #default="scope">
@@ -144,6 +144,7 @@ import pdfIcon from '@/assets/icons/pdf.svg'
 import pptIcon from '@/assets/icons/ppt.svg'
 import xlsxIcon from '@/assets/icons/xlsx.svg'
 import useFileUpload,{ allowedExtensions } from './useFileUpload'
+import { useUploadStore } from '@/store/uploadData'
 
 
 export type DocumentStatus = 'waiting' | 'uploading' | 'failed'| 'editing' | 'parsing' | 'success'  | 'parse_failed'
@@ -155,9 +156,12 @@ export interface DocumentItem {
   fileType?: string
   status: DocumentStatus
   creator: string
-  uploadTime: string
+  createdAt: string
 
 }
+
+const uploadStore = useUploadStore()
+const getKbId = ref('kbId')
 
 // 上传文档相关更改表格数据
 
@@ -217,7 +221,7 @@ const mockData: DocumentItem[] = [
     fileSize: '32.2MB',
     status: 'success',
     creator: '徐之琪',
-    uploadTime: '2025-07-13 12:00:00'
+    createdAt: '2025-07-13 12:00:00'
   },
   {
     id: '2',
@@ -225,7 +229,7 @@ const mockData: DocumentItem[] = [
     fileSize: '32.2MB',
     status: 'editing',
     creator: '雨奇',
-    uploadTime: '2025-07-11 16:12:00'
+    createdAt: '2025-07-11 16:12:00'
   },
   {
     id: '3',
@@ -233,7 +237,7 @@ const mockData: DocumentItem[] = [
     fileSize: '32.2MB',
     status: 'success',
     creator: '简泽浩',
-    uploadTime: '2025-07-12 12:00:00'
+    createdAt: '2025-07-12 12:00:00'
   },
   {
     id: '4',
@@ -241,7 +245,7 @@ const mockData: DocumentItem[] = [
     fileSize: '32.2MB',
     status: 'parsing',
     creator: '简泽浩',
-    uploadTime: '2025-07-12 12:00:00'
+    createdAt: '2025-07-12 12:00:00'
   },
   {
     id: '5',
@@ -249,7 +253,7 @@ const mockData: DocumentItem[] = [
     fileSize: '32.2MB',
     status: 'failed',
     creator: '雨奇',
-    uploadTime: '2025-07-11 16:12:00'
+    createdAt: '2025-07-11 16:12:00'
   },
   {
     id: '6',
@@ -257,7 +261,7 @@ const mockData: DocumentItem[] = [
     fileSize: '32.2MB',
     status: 'success',
     creator: '简泽浩',
-    uploadTime: '2025-07-12 12:00:00'
+    createdAt: '2025-07-12 12:00:00'
   },
   {
     id: '7',
@@ -265,7 +269,7 @@ const mockData: DocumentItem[] = [
     fileSize: '32.2MB',
     status: 'parse_failed',
     creator: '简泽浩',
-    uploadTime: '2025-07-12 12:00:00'
+    createdAt: '2025-07-12 12:00:00'
   },
   {
     id: '8',
@@ -273,7 +277,7 @@ const mockData: DocumentItem[] = [
     fileSize: '28.5MB',
     status: 'success',
     creator: '徐之琪',
-    uploadTime: '2025-07-10 09:30:00'
+    createdAt: '2025-07-10 09:30:00'
   },
   {
     id: '10',
@@ -281,7 +285,7 @@ const mockData: DocumentItem[] = [
     fileSize: '45.2MB',
     status: 'parsing',
     creator: '简泽浩',
-    uploadTime: '2025-07-08 16:45:00'
+    createdAt: '2025-07-08 16:45:00'
   },
 ]
 
@@ -289,7 +293,7 @@ const mockData: DocumentItem[] = [
 // 设置文件图标
 const getFileIcon = (fileName: string) => {
 
-  switch(fileName.split('.').pop()?.toLowerCase()){
+  switch(fileName?.split('.').pop()?.toLowerCase()){
     case 'pdf':
       return pdfIcon
     case 'ppt':
@@ -302,6 +306,7 @@ const getFileIcon = (fileName: string) => {
     case 'docx':
       return wordIcon
     default:
+      return wordIcon
   }
 }
 
@@ -330,6 +335,12 @@ watch(gotoPage, (newVal) => {
 
 // 数据加载
 const loadData = async () => {
+   const storeUploadingFiles = uploadStore.getFilesByKbId(getKbId.value);
+   //说明没有上传中的文件
+   if (storeUploadingFiles.length === 0){}
+  //  如果有的话，可以多搜索的等数据做处理
+
+
 
   // 应用筛选条件
   let filteredData = [...mockData]
