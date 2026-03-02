@@ -19,6 +19,11 @@
           浮动元素是如何定位的
         正如我们前面提到的那样，当一个元素浮动之后，它会被移出正常的文档流，然后向左或者向右平移，一直平移直到碰到了所处的容器的边框，或者碰到另外一个浮动的元素。
         </div>
+        <div class="text4 w-[400px]">
+          <div class="text-[14px] text-second-gray leading-6 line-clamp-4">
+            使用postcss css 布局 主要使用line-clamp-4属性，该用户没有参与OpenMem和MemOS。用户在最近的交互中表现出了对技术文档和架构设计的浓厚兴趣，特别是在记忆张量核心组件的技术说明方面。用户不仅关注现有的功能，还对未来的扩展性和集成性提出了具体的疑问。用户在最近的交互中表现出了对技术文档和架构设计的浓厚兴趣，特别是在记忆张量核心组件的技术说明方面。用户不仅关注现有的功能，还对未来的扩展性和集成性提出了具体的疑问。
+          </div>
+        </div>
 
       </div>
       </div>
@@ -89,6 +94,10 @@ import { ref } from 'vue'
       width: 0px;
       height: 50px;
       background: red;
+    }
+    .text4{
+      width: 400px;
+      @extend .common-text;
     }
   }
 }

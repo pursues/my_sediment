@@ -21,23 +21,38 @@
     </div>
 
     <div class="nav-user">
-      <div class="header-right-item flex items-center gap-[8px] cursor-pointer">
-        <img
-          class="h-[32px] w-[32px] rounded-[50%]"
-          src="../../assets/icons/icon-user.svg"
-          alt="user"
-        />
-        <span class="text-[14px] font-medium text-[#fff]">眸子的色彩</span>
-      </div>
+      <el-dropdown trigger="click" @command="handleCommand">
+        <div class="header-right-item flex items-center gap-[8px] cursor-pointer outline-none">
+          <img
+            class="h-[32px] w-[32px] rounded-[50%]"
+            src="../../assets/icons/icon-user.svg"
+            alt="user"
+          />
+          <span class="text-[14px] font-medium text-[#fff]">眸子的色彩</span>
+        </div>
+        <template #dropdown>
+          <el-dropdown-menu>
+            <el-dropdown-item command="logout">退出登录</el-dropdown-item>
+          </el-dropdown-menu>
+        </template>
+      </el-dropdown>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useUserStore } from '@/store/userStore'
+import { useRouter } from 'vue-router'
 
 const userStore = useUserStore()
+const router = useRouter()
 
+const handleCommand = (command: string) => {
+  if (command === 'logout') {
+    localStorage.clear()
+    router.push('/login')
+  }
+}
 
 const handleSelect = (key: string) => {
   userStore.setLeftNavRouterList(key)
